@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+
+<html lang="en">
+    <head>
+        <title>School DB</title>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link rel="stylesheet"
+              href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+        <link rel="stylesheet" href="style.css" type="text/css"/>
+
+        <script
+        src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+        <script
+        src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+
+    </head>
+    <body>
+        <section class="container">
+            <center>
+                <font>
+                <b>
+                    <h1>Student Registration Form</h1>
+                </b>
+                <p>Use this for Registration of Student.</p>
+                </font>
+            </center>
+
+            <form id="stuForm" method="post">
+                <div class="form-group">
+                    <center>
+                        <tr>
+                            <td> <b> Roll-No: </b></td>
+                            </br>
+                            <td><input type="number" min="1" max="99999" name="rollNo" id="rollNo" 
+                                       onchange="getStu()" required></td>
+                        </tr>
+                    </center>
+                </div> 
+
+
+                <div class="form-group">
+                    <center>
+                        <label for="name">Full-Name:</label>
+                        </br>
+                        <input id="fullName" name="fullName" type="text" placeholder="Enter Your Full Name"  size="20" required />
+                    </center>
+
+                </div>
+
+                <div class="form-group">
+                    <center>
+                        <tr>
+                            <td><b>Class: </b></td>
+                            </br>
+                            <td><input type="text" min="1" max="12" name="stuClass" id="stuClass" 
+                                       placeholder="Enter Your Class"  size="10" required>
+                            </td>
+
+                        </tr>
+                    </center>
+
+                </div>
+                <div class="form-group">
+                    <center>
+
+                        <label for="stuAddress">Address:</label>
+                        </br>
+                        <textarea id="stuAddress" name="stuAddress" rows="6" cols="65" placeholder="Enter Your Address"
+                                  required></textarea>
+                    </center>
+
+                </div>
+                <div class="form-group">
+                    <center>
+                        <tr>
+                            <td><b> Birth-Date:</b></td>
+                            </br>
+                            <td><input type="date" name="birthDate" id="birthDate" size="30" required></td>
+                        </tr>
+                    </center>
+                </div> 
+                <div class="form-group">
+                    <center>
+                        <tr>
+                            <td><b>Enrollment-Date: </b></td>
+                            </br>
+                            <td><input type="date" name="enrollmentDate" id="enrollmentDate" size="30" required></td>
+                        </tr>
+                    </center>
+                    <button type="reset" class="bottom_button">RESET</button>
+
+                    <script></script>
+
+                    <br> <br>
+                    <input type="button" class="btn btn-primary" id="stuSave" value="Save"
+                           onclick="saveStudent();">
+                    <input type="button" class="btn btn-primary" id="stuUpdate" value="Update"
+                           onclick="updateStudent();">
+
+
+                </div>
+
+
+
+
+            </form>
+
+        </div>
+
+        <script type="text/javascript" src="https://login2explore.com/jpdb/resources/js/0.0.3/jpdb-commons.js"></script>
+
+
+        <script type="text/javascript" src="js/index.js"></script>
+
+        <div>
+            <br>
+            <div class="form-group">
+                <h2>Form Data</h2>
+                <table class="table table-bordered">
+                    <thead>
+                    <th>Roll-No</th>
+                    <th>Full-Name</th>
+                    <th>Address</th>
+                    <th>Birth-Date</th>
+                    <th>Class</th>
+                    <th>Enrollment-Date</th>
+                    <th>Update</th>
+                    <th>Delete</th>
+
+                    </thead>
+                    <tbody id="tbData">
+
+                    </tbody>
+
+                </table>
+            </div>
+
+        </div>
+
+        
+
+
+
+
+
+
+        <script>
+
+            var editFormData;
+
+            function getFormData() {
+                return {
+                    rollNo: document.getElementById("rollNo").value,
+                    fullName: document.getElementById("fullName").value,
+                    stuaAddress: document.getElementById("stuaAddress").value,
+                    birthDate: document.getElementById("birthDate").value,
+                    stuClass: document.getElementById("stuClass").value,
+                    enrollmentDate: document.getElementById("enrollmentDate").value
+                }
+                var putReqStr = createPUTRequest("90938312|-31949273704151151|90952338",
+                        jsonStr, "School", "Student-Rel");
+                alert(putReqStr);
+                jQuery.ajaxSetup({async: false});
+                var resultObj = executeCommand(putReqStr,
+                        "http://api.login2explore.com:5577", "/api/iml");
+                alert(JSON.stringify(resultObj));
+                jQuery.ajaxSetup({async: true});
+                if (resultObj.status === 400) {
+                    $("#stuSave").prop("disabled", false);
+                    $("#stuName").focus();
+
+
+                }else if (resultObj.status ===200){
+                    $("#rollNo").prop("disabled", true);
+                    fillData(resultObj);
+                    
+                    $("#stuUpdate").prop("disabled", false);
+                    $("#stuName").focus();
+                    
+                    
+                }
+                
+            }
+            function saveRecNo2LS(jsonObj) {
+                var lvData = JSON.parse(jsonObj.data);
+                localStorage.setItem("recno", lvData.rec_no);
+            }
+            
+            function fillData(jsonObj) {
+                saveRecNo2LS(jsonObj);
+                var record = JSON.parse(jsonObj.data).record;
+                $("#stuName").val(record.stuName);
+                $("#stuAddress").val(record.stuAddress);
+                $("#stuClass").val(record.stuClass);
+                $("#birthDate").val(record.birthDate);
+                $("#enrollmentDate").val(record.enrollmentDate);
+                
+            }
+            function clearFormData() {
+                document.getElementById("rollNo").value = "";
+                document.getElementById("fullName").value = "";
+                document.getElementById("stuaAddress").value = "";
+                document.getElementById("birthDate").value = "";
+                document.getElementById("stuClass").value = "";
+                document.getElementById("enrollmentDate").value = "";
+            }
+
+            function setFormData(rollNo, fullName, stuaAddress, birthDate, stuClass, enrollmentDate) {
+                document.getElementById("rollNo").value = rollNo;
+                document.getElementById("fullName").value = fullName;
+                document.getElementById("stuaAddress").value = stuaAddress;
+                document.getElementById("birthDate").value = birthDate;
+                document.getElementById("stuClass").value = stuClass;
+                document.getElementById("enrollmentDate").value = enrollmentDate;
+            }
+
+            // set the message for form status
+            function setSuccessMessage(message) {
+                document.getElementById("message").innerHTML = message;
+            }
+            function editDataCall(id) {
+                // call get user details by id API
+                fetch("http://localhost:8383/crud/getUserByID?id=" + id, {
+                    method: "GET"
+                }).then((res) => res.json()).then((response) => {
+                    console.log("Edit info", response);
+                    editFormData = response[0];
+                    setFormData(editFormData.fullName, editFormData.stuaAddress, editFormData.birthDate, editFormData.stuClass, editFormData.enrollmentDate)
+                })
+            }
+
+            // callled this function when user click on button
+            function saveForm() {
+                if (!editFormData)
+                    addUser(); // if the editFormData is undefined then call addUser()
+                else
+                    editData();
+            }
+            // add user function 
+            function addUser() {
+                let payload = getFormData();
+                fetch("http://localhost:8383/crud/insertData", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify(payload)
+                }).then((res) => res.json()).then((response) => {
+                    setSuccessMessage(response.message)
+                    // clear input email and name
+                    clearFormData();
+                    getData(); // reload table 
+                })
+            }
+
+            // edit data 
+            function editData() {
+                var formData = getFormData();
+                formData['id'] = editFormData._id; // get _id from selected user
+                fetch("http://localhost:8383/crud/updateData", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify(formData)
+                }).then((res) => res.json()).then((response) => {
+                    setSuccessMessage(response.message)
+                    clearFormData(); // clear the form field
+                    getData() // reload the table
+                })
+            }
+
+            // delete data
+            function deleteData(id) {
+                fetch("http://localhost:8383/crud/delete?id=" + id).then((res) => res.json()).then(
+                        (response) => {
+                    setSuccessMessage(response.message);
+                    getData();
+                }
+                )
+            }
+
+            // get data method
+
+            function getData() {
+                fetch("http://localhost:8383/crud/getListData").then(
+                        (res) => res.json()
+                ).then((response) => {
+                    var tmpData = "";
+                    console.log(response);
+                    response.forEach((user) => {
+                        tmpData += "<tr>"
+                        tmpData += "<td>" + user.fullName + "</td>";
+                        tmpData += "<td>" + user.rollNo + "</td>";
+                        tmpData += "<td>" + user.stuaAddress + "</td>";
+                        tmpData += "<td>" + user.birthDate + "</td>";
+                        tmpData += "<td>" + user.stuClass + "</td>";
+                        tmpData += "<td>" + user.enrollmentDate + "</td>";
+                        tmpData += "<td><button class='btn btn-primary' onclick='editDataCall(`" + user._id + "`)'>Edit</button></td>";
+                        tmpData += "<td><button class='btn btn-danger' onclick='deleteData(`" + user._id + "`)'>Delete</button></td>";
+
+                        tmpData += "</tr>";
+                    })
+                    document.getElementById("tbData").innerHTML = tmpData;
+                })
+            }
+
+            getData();
+
+
+
+
+
+
+            function validateAndGetFormData() {
+                var rollNo = $("#rollNo").val();
+                if (rollNo === "") {
+                    alert("Roll No is Required Value");
+                    $("#rollNo").focus();
+                    return "";
+                }
+                var fullName = $("#fullName").val();
+                if (fullName === "") {
+                    alert("Student Name is Required Value");
+                    $("#fullName").focus();
+                    return "";
+                }
+                var birthDate = $("#birthDate").val();
+                if (birthDate === "") {
+                    alert("Birth-Date is Required Value");
+                    $("#birthDate").focus();
+                    return "";
+                }
+                var stuClass = $("#stuClass").val();
+                if (stuClass === "") {
+                    alert("Student Class is Required Value");
+                    $("#stuClass").focus();
+                    return "";
+                }
+                var stuAddress = $("#stuAddress").val();
+                if (stuAddress === "") {
+                    alert("Student Address is Required Value");
+                    $("#stuAddress").focus();
+                    return "";
+                }
+                var enrollmentDate = $("#enrollmentDate").val();
+                if (enrollmentDate === "") {
+                    alert("Enrollment Date is Required Value");
+                    $("#enrollmentDate").focus();
+                    return "";
+                }
+                var jsonStrObj = {
+                    rollNo: rollNo,
+                    fullName: fullName,
+                    birthDate: birthDate,
+                    stuClass: stuClass,
+                    stuAddress: stuAddress,
+                    enrollmentDate: enrollmentDate
+
+
+                };
+                return JSON.stringify(jsonStrObj);
+            }
+
+            function createPUTRequest(connToken, jsonObj, dbName, relName) {
+                var putRequest = "{\n"
+                        + "\"token\" : \""
+                        + connToken
+                        + "\","
+                        + "\"dbName\": \""
+                        + dbName
+                        + "\",\n" + "\"cmd\" : \"PUT\",\n"
+                        + "\"rel\" : \""
+                        + relName + "\","
+                        + "\"jsonStr\": \n"
+                        + jsonObj
+                        + "\n"
+                        + "}";
+                return putRequest;
+            }
+
+            function executeCommand(reqString, dbBaseUrl, apiEndPointUrl) {
+                var url = dbBaseUrl + apiEndPointUrl;
+                var jsonObj;
+                $.post(url, reqString, function (result) {
+                    jsonObj = JSON.parse(result);
+                }).fail(function (result) {
+                    var dataJsonObj = result.responseText;
+                    jsonObj = JSON.parse(dataJsonObj);
+                });
+                return jsonObj;
+            }
+
+
+
+
+
+
+            function resetForm() {
+                $("#rollNo").val("")
+                $("#fullName").val("");
+                $("#birthDate").val("");
+                $("#stuClass").val("");
+                $("#stuAddress").val("");
+                $("#enrollmentDate").val("");
+                $("#rollNo").prop("disabled", false);
+                $("#stuSave").prop("disabled", true);
+                $("#stuUpdate").prop("disabled", true);
+                $("#rollNo").focus();
+            }
+
+            function insertStudent() {
+                $.ajax
+            }
+
+            function saveStudent() {
+                var jsonStr = validateAndGetFormData();
+                if (jsonStr === "") {
+                    return;
+                }
+                var putReqStr = createPUTRequest("90938312|-31949273704151151|90952338",
+                        jsonStr, "School", "Student-Rel");
+                alert(putReqStr);
+                jQuery.ajaxSetup({async: false});
+                var resultObj = executeCommand(putReqStr,
+                        "http://api.login2explore.com:5577", "/api/iml");
+                alert(JSON.stringify(resultObj));
+                jQuery.ajaxSetup({async: true});
+                resetForm();
+                $("#rollNo").focus();
+            }
+
+
+            function updateStudent() {
+                var jsonStr = validateAndGetFormData();
+                if (jsonStr === "") {
+                    return;
+                }
+                var putReqStr = createPUTRequest("90938312|-31949273704151151|90952338",
+                        jsonStr, "School", "Student-Rel", localStorage.getItem("recno"));
+                alert(putReqStr);
+                jQuery.ajaxSetup({async: false});
+                var resultObj = executeCommand(putReqStr,
+                        "http://api.login2explore.com:5577", "/api/iml");
+                alert(JSON.stringify(resultObj));
+                jQuery.ajaxSetup({async: true});
+                console.log(resJsonObj);
+                resetForm();
+                $("#rollNo").focus();
+            }
+
+            function handleFormSave(event) {
+
+                event.preventDefault();
+
+                const data = new FormData(event.target);
+
+                const formJSON = Object.fromEntries(data.entries());
+
+                // for multi-selects, we need special handling
+                formJSON.snacks = data.getAll('snacks');
+
+                const results = document.querySelector('.results pre');
+                results.innerText = JSON.stringify(formJSON, null, 2);
+            }
+
+            const form = document.querySelector('.form-group');
+            form.addEventListener('Save', handleFormSave);
+        </script>
+
+
+
+
+</body>
+</html>
